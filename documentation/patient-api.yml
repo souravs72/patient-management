@@ -1,0 +1,218 @@
+openapi: 3.0.9
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:4000
+    description: Generated server url
+tags:
+  - name: Patient
+    description: Endpoints for managing patient data
+paths:
+  /patients/{id}:
+    put:
+      tags:
+        - Patient
+      summary: Update existing patient
+      description: Modifies the details of an existing patient
+      operationId: updatePatient
+      parameters:
+        - name: id
+          in: path
+          description: UUID of the patient to update
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRequestDTO'
+        required: true
+      responses:
+        '200':
+          description: Patient updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponseDTO'
+        '400':
+          description: Validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PatientResponseDTO'
+        '404':
+          description: Patient not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PatientResponseDTO'
+    delete:
+      tags:
+        - Patient
+      summary: Delete a patient
+      description: Deletes a patient record by ID
+      operationId: deletePatient
+      parameters:
+        - name: id
+          in: path
+          description: UUID of the patient to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Patient deleted successfully
+        '404':
+          description: Patient not found
+  /patients:
+    get:
+      tags:
+        - Patient
+      summary: Retrieve all patients
+      description: Returns a paginated list of patients
+      operationId: getAllPatients
+      parameters:
+        - name: page
+          in: query
+          description: Page number (0-based)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+      responses:
+        '200':
+          description: List of patients retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+    post:
+      tags:
+        - Patient
+      summary: Create a new patient
+      description: Adds a new patient to the system
+      operationId: createPatient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRequestDTO'
+        required: true
+      responses:
+        '201':
+          description: Patient created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponseDTO'
+        '400':
+          description: Validation error
+components:
+  schemas:
+    PatientRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 50
+          minLength: 0
+        email:
+          type: string
+          minLength: 1
+        address:
+          type: string
+          minLength: 1
+        dateOfBirth:
+          type: string
+          minLength: 1
+        registeredDate:
+          type: string
+      required:
+        - address
+        - dateOfBirth
+        - email
+        - name
+    PatientResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        dateOfBirth:
+          type: string
+    Page:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items: {}
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        paged:
+          type: boolean
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        unpaged:
+          type: boolean
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/SortObject'
+    SortObject:
+      type: object
+      properties:
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+        empty:
+          type: boolean

@@ -1,0 +1,11 @@
+### Create request to add a patient
+POST http://localhost:4000/patients
+Content-Type: application/json
+
+{
+  "name": "Sourav Singh",
+  "email": "sourav@example.com",
+  "address": "E 10 Paikpara Street",
+  "dateOfBirth": "1996-09-26",
+  "registeredDate": "2025-05-13"
+}
