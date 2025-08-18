@@ -4,6 +4,7 @@ import com.convox.patientservice.dto.PatientRequestDTO;
 import com.convox.patientservice.dto.PatientResponseDTO;
 import com.convox.patientservice.exception.EmailAlreadyExistsException;
 import com.convox.patientservice.exception.PatientNotFoundException;
+import com.convox.patientservice.grpc.BillingServiceGrpcClient;
 import com.convox.patientservice.mapper.PatientMapper;
 import com.convox.patientservice.model.Patient;
 import com.convox.patientservice.repository.PatientRepository;
@@ -26,6 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PatientService {
     private final PatientRepository patientRepository;
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
     private final Logger logger = LoggerFactory.getLogger(PatientService.class);
 
     @Cacheable(value = "patients", key = "'all_patients_' + #page + '_' + #size")
@@ -48,6 +50,7 @@ public class PatientService {
         Patient newPatient = PatientMapper.toPatient(patientRequestDTO);
         newPatient.setRegisteredDate(LocalDate.now());
         newPatient = patientRepository.save(newPatient);
+        billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(), newPatient.getName(), newPatient.getEmail());
         logger.info("Patient created with ID: {}", newPatient.getId());
         return PatientMapper.toPatientResponseDTO(newPatient);
     }
