@@ -1,0 +1,4 @@
+### Get request to validate token
+GET http://localhost:4005/api/auth/validate
+Authorization: Bearer {{token}}
+
